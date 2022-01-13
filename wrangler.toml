@@ -1,0 +1,12 @@
+name = "d4dj-master-parser"
+type = "javascript"
+zone_id = "3ca38a871592e334b43ec1aee2c42aa4"
+account_id = "87a11d2b07ae2dda64f2a7a899d3aa21"
+route = ""
+workers_dev = true
+compatibility_date = "2022-01-13"
+
+[build]
+command = "yarn install && yarn run build"
+[build.upload]
+format = "service-worker"

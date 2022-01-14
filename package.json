@@ -11,13 +11,6 @@
   },
   "author": "author",
   "license": "MIT OR Apache-2.0",
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "typescript",
-      "prettier"
-    ]
-  },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.0.0",
     "@types/jest": "^26.0.23",

@@ -19,3 +19,14 @@ export function BadRequestException(reason: string): Response {
     },
   })
 }
+
+export function InternalServerErrorException(reason: string): Response {
+  return new Response(reason, {
+    status: 500,
+    statusText: 'Internal Server Error',
+    headers: {
+      'Content-Type': 'text/plain;charset=UTF-8',
+      'Cache-Control': 'no-store',
+    },
+  })
+}

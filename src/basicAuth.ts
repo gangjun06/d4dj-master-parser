@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 // https://developers.cloudflare.com/workers/examples/basic-auth
 
 import { BadRequestException, UnauthorizedException } from './responses'

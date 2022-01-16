@@ -25,6 +25,11 @@ export const ParseGroup: { [key: string]: string[] } = {
   Etc: [],
 }
 
+export const LocaleTable: { [key: string]: string } = {
+  en: 'en',
+  jp: 'ja-JP',
+}
+
 export const ParserData: { [key: string]: ParserDataType } = {
   Attribute: {},
   Card: {

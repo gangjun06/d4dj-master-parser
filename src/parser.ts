@@ -1,5 +1,5 @@
-import { group } from 'console'
 import * as values from './values'
+import * as request from './request'
 
 const formatText = (str: string): string => {
   str = str.replace(/__/gi, '')
@@ -8,11 +8,6 @@ const formatText = (str: string): string => {
     return str.replace(/^\b[A-Z]+/, match[0].toLowerCase())
   }
   return str
-}
-
-const requestAPIServer = () => {
-  //@ts-ignore
-  const [apiKey, apiUrl] = [API_KEY || '', API_URL || '']
 }
 
 const parseJSON = (json: any, parseFields: values.ParseFields): any[] => {
@@ -76,8 +71,20 @@ export const parse = async (
     //     console.log(meta.fields![item])
     //   })
 
-    const res = await requestMaster(region, name)
+    const res = await requestMaster(region, item)
     const parsed = parseJSON(res, meta.fields || {})
+    try {
+      for (const data of parsed) {
+        await request.createRequest({
+          locale: values.LocaleTable[region],
+          data,
+          name: item,
+          update: false,
+        })
+      }
+    } catch (e) {
+      console.error(e)
+    }
     return parsed
   }
 }

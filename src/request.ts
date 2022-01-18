@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export const createRequest = async (props: {
   data: object
   name: string
@@ -5,26 +7,37 @@ export const createRequest = async (props: {
   update: boolean
 }) => {
   //@ts-ignore
-  const [apiKey, apiUrl] = [API_KEY || '', API_URL || '']
-  const res = await fetch(`${apiUrl}/api/${props.name}/`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      data: {
-        ...props.data,
-        locale: props.locale,
+  const [apiKey, apiUrl] = [
+    process.env.API_KEY || '',
+    process.env.API_URL || '',
+  ]
+  try {
+    const res = await axios.post(
+      `${apiUrl}/api/${props.name}/`,
+      {
+        data: {
+          ...props.data,
+          locale: props.locale,
+        },
       },
-    }),
-  })
-  const json = await res.text()
-  console.log(json)
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+  } catch (e) {
+    //@ts-ignore
+    console.log(e.response.data)
+  }
 }
 
 export const getAllRequest = (props: { name: string }) => {
   //@ts-ignore
-  const [apiKey, apiUrl] = [API_KEY || '', API_URL || '']
-  fetch(`${apiUrl}/api/${props.name}/`)
+  const [apiKey, apiUrl] = [
+    process.env.API_KEY || '',
+    process.env.API_URL || '',
+  ]
+  axios.get(`${apiUrl}/api/${props.name}/`)
 }

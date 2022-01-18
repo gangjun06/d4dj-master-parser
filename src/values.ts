@@ -83,6 +83,7 @@ export const ParserData: { [key: string]: ParserDataType } = {
   },
   Skill: {},
   Unit: {
+    name: 'units',
     fields: {
       initDeckCharacterIds: { ignore: true },
     },

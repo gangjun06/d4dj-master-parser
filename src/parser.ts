@@ -1,5 +1,6 @@
 import * as values from './values'
 import * as request from './request'
+import axios from 'axios'
 
 const formatText = (str: string): string => {
   str = str.replace(/__/gi, '')
@@ -16,7 +17,7 @@ const parseJSON = (json: any, parseFields: values.ParseFields): any[] => {
     const objItem: { [key: string]: any } = {}
     Object.keys(json[key]).forEach((key2) => {
       if (key2 === 'Id') {
-        objItem['masterID'] = json[key][key2]
+        objItem['masterID'] = `${json[key][key2]}`
       } else {
         const formated = formatText(key2)
         const parseField = parseFields[formated]
@@ -33,6 +34,8 @@ const parseJSON = (json: any, parseFields: values.ParseFields): any[] => {
             ] = item
           })
         } else if (parseField.relation) {
+        } else if (parseField.asJSON) {
+          objItem[parseField.name || formated] = JSON.stringify(json[key][key2])
         } else {
           objItem[parseField.name || formated] = json[key][key2]
         }
@@ -44,12 +47,9 @@ const parseJSON = (json: any, parseFields: values.ParseFields): any[] => {
 }
 
 const requestMaster = (region: string, name: string): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    fetch(`https://asset.d4dj.info/${region}/Master/${name}Master.json`)
-      .then((res) => res.json())
-      .then((res) => resolve(res))
-      .catch((reason) => reject(reason))
-  })
+  return axios.get(
+    `https://asset.d4dj.info/${region}/Master/${name}Master.json`,
+  )
 }
 
 export const parse = async (
@@ -72,19 +72,17 @@ export const parse = async (
     //   })
 
     const res = await requestMaster(region, item)
-    const parsed = parseJSON(res, meta.fields || {})
+    const parsed = parseJSON(res.data, meta.fields || {})
     try {
       for (const data of parsed) {
         await request.createRequest({
           locale: values.LocaleTable[region],
           data,
-          name: item,
+          name: meta.name || item,
           update: false,
         })
       }
-    } catch (e) {
-      console.error(e)
-    }
+    } catch (e) {}
     return parsed
   }
 }

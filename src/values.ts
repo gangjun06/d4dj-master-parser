@@ -61,12 +61,13 @@ export const ParserData: { [key: string]: ParserDataType } = {
     },
   },
   Character: {
+    name: 'characters',
     fields: {
       profileAnswers: { ignore: true },
       unitPrimaryKey: {
         name: 'unit',
         relation: {
-          target: 'unit',
+          target: 'units',
         },
       },
     },

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import * as values from './values'
+import * as values from '../data'
 
 export const create = async (props: {
   data: object
@@ -73,4 +73,10 @@ export const getAll = async (props: { name: string }) => {
   }
 
   return result
+}
+
+export const requestMaster = (region: string, name: string): Promise<any> => {
+  return axios.get(
+    `https://asset.d4dj.info/${region}/Master/${name}Master.json`,
+  )
 }

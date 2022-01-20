@@ -1,30 +1,6 @@
-export type ParseFields = {
-  [key: string]:
-    | string
-    | {
-        name?: string
-        ignore?: boolean
-        asJSON?: boolean
-        changeFieldByIndex?: string[]
-        relation?: {
-          target: string
-        }
-      }
-}
+import * as types from '../types'
 
-export type ParserDataType = {
-  name?: string
-  fields?: ParseFields
-  customFields?: {
-    load: string[]
-    fields: {
-      name: string
-      parser: (originalData: any, loadedData: { [key: string]: any[] }) => any
-    }[]
-  }
-}
-
-export const ParseGroup: { [key: string]: string[] } = {
+export const ParseGroup: types.ParseGroupType = {
   Character: ['Unit', 'Character', 'Attribute', 'Skill', 'Card'],
   Passive: ['PassiveSkill', 'PassiveSkillDescription', 'PassiveSkillExp'],
   Music: ['ChartAchieve', 'ChartDesigner', 'Music', 'Chart'],
@@ -33,12 +9,12 @@ export const ParseGroup: { [key: string]: string[] } = {
   Etc: [],
 }
 
-export const LocaleTable: { [key: string]: string } = {
+export const LocaleTable: types.LocaleTableType = {
   en: 'en',
   jp: 'ja-JP',
 }
 
-export const ParserData: { [key: string]: ParserDataType } = {
+export const ParserData: types.ParserDatasType = {
   Attribute: {
     name: 'attributes',
   },
@@ -157,6 +133,27 @@ export const ParserData: { [key: string]: ParserDataType } = {
     name: 'chart-designers',
   },
   Music: {
+    customFields: {
+      load: ['!MusicMix'],
+      fields: [
+        {
+          name: 'musicMix',
+          parser: (originalData, loadedData) => {
+            // const id = originalData.masterID
+            const result: any[] = []
+            // loadedData['!MusicMix'].forEach((item) => {
+            //   if (item.ChartId === id) {
+            //     result.push({
+            //       section: item.Section,
+            //       count: item.Count,
+            //     })
+            //   }
+            // })
+            return result
+          },
+        },
+      ],
+    },
     fields: {
       _unused: 'unused',
       purchaseBonusesPrimaryKey: {

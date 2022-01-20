@@ -28,7 +28,7 @@ const parseMasterItem = (
   const objItem: { [key: string]: any } = {}
   Object.keys(obj).forEach((key2) => {
     if (key2 === 'Id') {
-      objItem['masterID'] = `${obj[key2]}`
+      objItem['masterID'] = obj[key2]
     } else {
       const formated = formatText(key2)
       const parseField = fieldMeta[formated]
@@ -87,57 +87,90 @@ export const parse = async (
 
   const locale = values.LocaleTable[region]
 
+  let log: string[][] = []
+
   for (const item of parseList) {
     const meta = values.ParserData[item]
 
     const res = await requestMaster(region, item)
     const parsed = objToArr(res.data)
-    try {
-      const name = meta.name || item
-      let allData = downloadedData[name]
-      if (!allData) {
-        const allDataArr = await request.getAll({ name })
-        allData = dataArrToObj(allDataArr)
-        downloadedData[name] = allData
-      }
-
-      for (let item in meta.fields || {}) {
-        const field = meta.fields![item]
-        if (typeof field !== 'string' && field.relation) {
-          const allDataArr = await request.getAll({
-            name: field.relation.target,
-          })
-          downloadedData[field.relation.target] = dataArrToObj(allDataArr)
-          downloadedData[field.relation.target]
-        }
-      }
-
-      for (const data of parsed) {
-        const doParse = () =>
-          parseMasterItem(data, meta.fields || {}, downloadedData, locale)
-        const select = allData[data.Id]
-        if (select) {
-          if (!select[locale]) {
-            const parsed = doParse()
-            await request.create({
-              locale,
-              data: parsed,
-              name: meta.name || item,
-              update: select[Object.keys(select)[0]].id,
-            })
-          }
-          continue
-        }
-        const parsed = doParse()
-        await request.create({
-          locale,
-          data: parsed,
-          name: meta.name || item,
-        })
-      }
-    } catch (e) {
-      console.error(e)
+    const name = meta.name || item
+    let allData = downloadedData[name]
+    if (!allData) {
+      const allDataArr = await request.getAll({ name })
+      allData = dataArrToObj(allDataArr)
+      downloadedData[name] = allData
     }
-    return parsed
+
+    for (let item in meta.fields || {}) {
+      const field = meta.fields![item]
+      if (
+        typeof field !== 'string' &&
+        field.relation &&
+        !downloadedData[field.relation.target]
+      ) {
+        const allDataArr = await request.getAll({
+          name: field.relation.target,
+        })
+        downloadedData[field.relation.target] = dataArrToObj(allDataArr)
+      }
+    }
+
+    if (meta.customFields) {
+      for (let name of meta.customFields.load) {
+        if (!downloadedData[name]) {
+          const allData = name.startsWith('!')
+            ? await requestMaster(region, name.replace(/^!/, ''))
+            : await request.getAll({ name })
+          downloadedData[name] = name.startsWith('!')
+            ? objToArr(allData.data)
+            : dataArrToObj(allData)
+        }
+      }
+    }
+
+    for (const data of parsed) {
+      const doParse = () => {
+        const parsed = parseMasterItem(
+          data,
+          meta.fields || {},
+          downloadedData,
+          locale,
+        )
+        if (meta.customFields) {
+          for (let customField of meta.customFields.fields) {
+            parsed[customField.name] = customField.parser(
+              parsed,
+              downloadedData,
+            )
+          }
+        }
+        return parsed
+      }
+      const select = allData[data.Id]
+      if (select) {
+        if (!select[locale]) {
+          const parsed = doParse()
+          await request.create({
+            locale,
+            data: parsed,
+            name: meta.name || item,
+            update: select[Object.keys(select)[0]].id,
+          })
+          log.push([`${item}-${region}`, 'Add Locale', parsed.masterID])
+        }
+        continue
+      }
+      const parsed = doParse()
+      await request.create({
+        locale,
+        data: parsed,
+        name: meta.name || item,
+      })
+      log.push([`${item}-${region}`, 'Create', parsed.masterID])
+    }
+  }
+  return {
+    result: log,
   }
 }

@@ -15,13 +15,21 @@ export type ParseFields = {
 export type ParserDataType = {
   name?: string
   fields?: ParseFields
+  customFields?: {
+    load: string[]
+    fields: {
+      name: string
+      parser: (originalData: any, loadedData: { [key: string]: any[] }) => any
+    }[]
+  }
 }
 
 export const ParseGroup: { [key: string]: string[] } = {
-  Character: ['Unit', 'Character', 'Card'],
-  Music: [],
+  Character: ['Unit', 'Character', 'Attribute', 'Skill', 'Card'],
+  Passive: ['PassiveSkill', 'PassiveSkillDescription', 'PassiveSkillExp'],
+  Music: ['ChartAchieve', 'ChartDesigner', 'Music', 'Chart'],
   Event: [],
-  Items: [],
+  Items: ['StockViewCategory', 'Stock', 'Reward'],
   Etc: [],
 }
 
@@ -31,39 +39,53 @@ export const LocaleTable: { [key: string]: string } = {
 }
 
 export const ParserData: { [key: string]: ParserDataType } = {
-  Attribute: {},
+  Attribute: {
+    name: 'attributes',
+  },
   Card: {
     fields: {
-      rarityPrimaryKey: 'rarity',
-      maxParameters: {
-        changeFieldByIndex: ['heart', 'technique', 'physical'],
-      },
-      cardIllustHeadDistanceX: { asJSON: true },
-      CardIllustCenterDistanceX: { asJSON: true },
       attributePrimaryKey: {
         name: 'attribute',
         relation: {
-          target: 'attribute',
+          target: 'attributes',
         },
+      },
+      CardIllustCenterDistanceX: {
+        asJSON: true,
+      },
+      cardIllustHeadDistanceX: {
+        asJSON: true,
       },
       characterPrimaryKey: {
         name: 'character',
         relation: {
-          target: 'character',
+          target: 'characters',
         },
       },
+      maxParameters: {
+        changeFieldByIndex: ['heart', 'technique', 'physical'],
+      },
+      passiveSkillPrimaryKey: {
+        name: 'passiveSkill',
+        relation: {
+          target: 'passive-skills',
+        },
+      },
+      rarityPrimaryKey: 'rarity',
       skillParameterPrimaryKey: {
         name: 'skill',
         relation: {
-          target: 'skill',
+          target: 'skills',
         },
       },
     },
+    name: 'cards',
   },
   Character: {
-    name: 'characters',
     fields: {
-      profileAnswers: { ignore: true },
+      profileAnswers: {
+        ignore: true,
+      },
       unitPrimaryKey: {
         name: 'unit',
         relation: {
@@ -71,22 +93,133 @@ export const ParserData: { [key: string]: ParserDataType } = {
         },
       },
     },
+    name: 'characters',
+  },
+  Chart: {
+    customFields: {
+      fields: [
+        {
+          name: 'chartNoteCount',
+          parser: (originalData, loadedData) => {
+            const id = originalData.masterID
+            const result: any[] = []
+            loadedData['!ChartNoteCount'].forEach((item) => {
+              if (item.ChartId === id) {
+                result.push({
+                  section: item.Section,
+                  count: item.Count,
+                })
+              }
+            })
+            return result
+          },
+        },
+      ],
+      load: ['!ChartNoteCount'],
+    },
+    fields: {
+      designerPrimaryKey: {
+        name: 'designer',
+        relation: {
+          target: 'chart-designers',
+        },
+      },
+      musicPrimaryKey: {
+        name: 'music',
+        relation: {
+          target: 'music-games',
+        },
+      },
+      trends: {
+        changeFieldByIndex: [
+          'notes',
+          'danger',
+          'scratch',
+          'effect',
+          'technique',
+        ],
+      },
+    },
+    name: 'charts',
+  },
+  ChartAchieve: {
+    fields: {
+      rewardStockPrimaryKey: {
+        name: 'rewardStock',
+        relation: {
+          target: 'stocks',
+        },
+      },
+    },
+    name: 'chart-achieves',
+  },
+  ChartDesigner: {
+    name: 'chart-designers',
   },
   Music: {
-    name: 'MusicGame',
+    fields: {
+      _unused: 'unused',
+      purchaseBonusesPrimaryKey: {
+        asJSON: true,
+        name: 'purchaseBonuses',
+      },
+      unitPrimaryKey: {
+        name: 'unit',
+        relation: {
+          target: 'units',
+        },
+      },
+    },
+    name: 'music-games',
+  },
+  PassiveSkill: {
+    name: 'passive-skills',
+  },
+  PassiveSkillDescription: {
+    name: 'passive-skill-descriptions',
+  },
+  PassiveSkillExp: {
+    fields: {
+      rarityId: 'rarity',
+    },
+    name: 'passive-skill-exps',
   },
   Rarity: {
     fields: {
-      maxLevels: { asJSON: true },
-      maxLevelParameterRates: { asJSON: true },
-      limitBreakBonuses: { asJSON: true },
+      limitBreakBonuses: {
+        asJSON: true,
+      },
+      maxLevelParameterRates: {
+        asJSON: true,
+      },
+      maxLevels: {
+        asJSON: true,
+      },
     },
   },
-  Skill: {},
-  Unit: {
-    name: 'units',
+  Skill: {
+    name: 'skills',
+  },
+  Stock: {
     fields: {
-      initDeckCharacterIds: { ignore: true },
+      viewCategoryPrimaryKey: {
+        name: 'viewCategory',
+        relation: {
+          target: 'stock-view-categories',
+        },
+      },
     },
+    name: 'stocks',
+  },
+  StockViewCategory: {
+    name: 'stock-view-categories',
+  },
+  Unit: {
+    fields: {
+      initDeckCharacterIds: {
+        ignore: true,
+      },
+    },
+    name: 'units',
   },
 }

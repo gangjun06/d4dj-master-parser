@@ -21,7 +21,7 @@ app.post('/', async (req, res) => {
 
   const name = body.name
   const region = body.region
-  const group = body.group
+  const group = body.group as boolean
   if (!name) {
     res.status(400)
     return res.send('Name param is required')
@@ -31,12 +31,13 @@ app.post('/', async (req, res) => {
   }
 
   try {
-    const resData = await parse(region, name, group === 'true')
+    const resData = await parse(region, name, group)
     if (resData) {
       return res.json(resData)
     }
   } catch (e) {
     res.status(500)
+    console.error(e)
     return res.send(e as any)
   }
 

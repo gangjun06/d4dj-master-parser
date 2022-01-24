@@ -1,4 +1,5 @@
 import * as types from '../types'
+import { parseMasterItem } from '../utils'
 
 export const ParseGroup: types.ParseGroupType = {
   Character: ['Unit', 'Character', 'Attribute', 'Skill', 'Card'],
@@ -12,6 +13,21 @@ export const ParseGroup: types.ParseGroupType = {
 export const LocaleTable: types.LocaleTableType = {
   en: 'en',
   jp: 'ja-JP',
+}
+
+const conditionCustomParser: types.ParserDataCustomFieldsContent = {
+  name: 'condition',
+  parser: (originalData, loadedData) =>
+    loadedData['!Condition']
+      .filter(
+        (item) =>
+          originalData['__ConditionsPrimaryKey__'].indexOf(item.Id) > -1,
+      )
+      .map((item) => ({
+        masterID: item.Id,
+        category: item.Category,
+        value: JSON.stringify(item.Value),
+      })),
 }
 
 export const ParserData: types.ParserDatasType = {
@@ -58,6 +74,22 @@ export const ParserData: types.ParserDatasType = {
     name: 'cards',
   },
   Character: {
+    customFields: {
+      fields: [
+        {
+          name: 'episode',
+          parser: (originalData, loadedData, locale) =>
+            loadedData['!CharacterEpisode']
+              .filter((item) => item['CharacterId'] === originalData.Id)
+              .map((item) => ({
+                backgroundId: item.BackgroundId,
+                chapterNumber: item.ChapterNumber,
+                episode: loadedData['episodes'][item.Id][locale].id,
+              })),
+        },
+      ],
+      load: ['episodes', '!CharacterEpisode'],
+    },
     fields: {
       profileAnswers: {
         ignore: true,
@@ -76,19 +108,13 @@ export const ParserData: types.ParserDatasType = {
       fields: [
         {
           name: 'chartNoteCount',
-          parser: (originalData, loadedData) => {
-            const id = originalData.masterID
-            const result: any[] = []
-            loadedData['!ChartNoteCount'].forEach((item) => {
-              if (item.ChartId === id) {
-                result.push({
-                  section: item.Section,
-                  count: item.Count,
-                })
-              }
-            })
-            return result
-          },
+          parser: (originalData, loadedData) =>
+            loadedData['!ChartNoteCount']
+              .filter((item) => item.ChartId === originalData.Id)
+              .map((item) => ({
+                section: item.Section,
+                count: item.Count,
+              })),
         },
       ],
       load: ['!ChartNoteCount'],
@@ -132,27 +158,116 @@ export const ParserData: types.ParserDatasType = {
   ChartDesigner: {
     name: 'chart-designers',
   },
+  Episode: {
+    customFields: {
+      fields: [conditionCustomParser],
+      load: ['!Condition'],
+    },
+    fields: {
+      conditionsPrimaryKey: {
+        ignore: true,
+      },
+      rewardsPrimaryKey: {
+        asJSON: true,
+        name: 'rewards',
+      },
+    },
+    name: 'episodes',
+  },
+  Event: {
+    customFields: {
+      fields: [
+        {
+          name: 'episode',
+          parser: (originalData, loadedData, locale) =>
+            loadedData['!EventEpisode']
+              .filter((item) => item['__EventPrimaryKey__'] === originalData.Id)
+              .map((item) => ({
+                backgroundId: item.BackgroundId,
+                chapterNumber: item.ChapterNumber,
+                episode: loadedData['episodes'][item.Id][locale].id,
+              })),
+        },
+      ],
+      load: ['episodes', '!EventEpisode'],
+    },
+    fields: {
+      episodeCharacters: {
+        relation: {
+          target: 'characters',
+        },
+      },
+      type: {
+        changeValueByName: {
+          '': 'Etc',
+          keyDown: 'Raid',
+          keyUp: 'Slot',
+          mouseDrag: 'Poker',
+          mouseMove: 'Medley',
+          mouseUp: 'Bingo',
+        },
+      },
+    },
+    name: 'events',
+  },
+  Live2DUIChat: {
+    fields: {
+      categories: {
+        asJSON: true,
+      },
+      characterPrimaryKey: {
+        name: 'character',
+        relation: {
+          target: 'characters',
+        },
+      },
+    },
+    name: 'live2d-ui-chats',
+  },
+  LiveResultEpisode: {
+    customFields: {
+      fields: [
+        {
+          name: 'episode',
+          parser: (originalData, loadedData, locale) =>
+            loadedData['episodes'][originalData.Id][locale].id,
+        },
+      ],
+      load: ['episodes'],
+    },
+    fields: {
+      charactersPrimaryKey: {
+        name: 'characters',
+        relation: {
+          target: 'characters',
+        },
+      },
+    },
+    name: 'live-result-episodes',
+  },
   Music: {
     customFields: {
-      load: ['!MusicMix'],
       fields: [
         {
           name: 'musicMix',
-          parser: (originalData, loadedData) => {
-            // const id = originalData.masterID
-            const result: any[] = []
-            // loadedData['!MusicMix'].forEach((item) => {
-            //   if (item.ChartId === id) {
-            //     result.push({
-            //       section: item.Section,
-            //       count: item.Count,
-            //     })
-            //   }
-            // })
-            return result
-          },
+          parser: (originalData, loadedData) =>
+            loadedData['!MusicMix']
+              .filter((item) => item['__MusicPrimaryKey__'] === originalData.Id)
+              .map((item) =>
+                parseMasterItem(
+                  item,
+                  {
+                    musicPrimaryKey: {
+                      ignore: true,
+                    },
+                  },
+                  {},
+                  '',
+                ),
+              ),
         },
       ],
+      load: ['!MusicMix'],
     },
     fields: {
       _unused: 'unused',
@@ -212,6 +327,23 @@ export const ParserData: types.ParserDatasType = {
     name: 'stock-view-categories',
   },
   Unit: {
+    customFields: {
+      fields: [
+        {
+          name: 'episode',
+          parser: (originalData, loadedData, locale) =>
+            loadedData['!UnitEpisode']
+              .filter((item) => item['__UnitPrimaryKey__'] === originalData.Id)
+              .map((item) => ({
+                backgroundId: item.BackgroundId,
+                chapterNumber: item.ChapterNumber,
+                season: item.Season,
+                episode: loadedData['episodes'][item.Id][locale].id,
+              })),
+        },
+      ],
+      load: ['episodes', '!UnitEpisode'],
+    },
     fields: {
       initDeckCharacterIds: {
         ignore: true,

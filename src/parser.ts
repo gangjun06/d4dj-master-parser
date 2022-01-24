@@ -77,20 +77,21 @@ export const parse = async (
 
     for (const data of parsed) {
       const doParse = () => {
-        const parsed = parseMasterItem(
-          data,
-          meta.fields || {},
-          downloadedData,
-          locale,
-        )
+        let parsed: any = {}
         if (meta.customFields) {
           for (let customField of meta.customFields.fields) {
             parsed[customField.name] = customField.parser(
-              parsed,
+              data,
               downloadedData,
+              locale,
             )
           }
         }
+        parsed = {
+          ...parsed,
+          ...parseMasterItem(data, meta.fields || {}, downloadedData, locale),
+        }
+
         return parsed
       }
 

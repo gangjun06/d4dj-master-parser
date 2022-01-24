@@ -34,7 +34,7 @@ export const parseMasterItem = (
         objItem[formated] = obj[key2]
       } else if (typeof parseField === 'string') {
         objItem[parseField] = obj[key2]
-      } else if (parseField.ignore === true || parseField.asJSON === true) {
+      } else if (parseField.ignore === true) {
       } else if (parseField.changeFieldByIndex) {
         objItem[parseField.name || formated] = {}
         ;(obj[key2] as []).forEach((item, index) => {
@@ -43,10 +43,21 @@ export const parseMasterItem = (
           ] = item
         })
       } else if (parseField.relation) {
-        objItem[parseField.name || formated] =
-          relationData[parseField.relation.target][obj[key2]][locale].id
+        if (typeof obj[key2] !== 'object') {
+          obj[key2] = [obj[key2]]
+        }
+        objItem[parseField.name || formated] = []
+        obj[key2].forEach((item: any) => {
+          objItem[parseField.name || formated].push(
+            relationData[parseField!.relation!.target][item][locale].id,
+          )
+        })
       } else if (parseField.asJSON) {
         objItem[parseField.name || formated] = JSON.stringify(obj[key2])
+      } else if (parseField.changeValueByName) {
+        objItem[parseField.name || formated] =
+          parseField.changeValueByName[obj[key2]] ||
+          parseField.changeValueByName['']
       } else {
         objItem[parseField.name || formated] = obj[key2]
       }

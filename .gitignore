@@ -4,3 +4,5 @@ transpiled
 /.idea/
 .vscode
 .env
+
+yarn-error.log

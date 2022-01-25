@@ -1,7 +1,41 @@
-# D4DJ Master parser
+# D4DJ Master Parser
 
-parsing d4dj groovy mix game's master file to store database.
+Parsing d4dj groovy mix game's master file to store DB
 
-it works with cloudflare worker.
+It workds with [d4dj-info-backend](https://github.com/gangjun06/d4dj-info-backend).
 
-template: [cloudflare/worker-typescript-template](https://github.com/cloudflare/worker-typescript-template) (Apache 2.0 / MIT)
+## Usage
+
+```bash
+yarn run build
+yarn run start
+```
+
+## API
+
+`POST /`
+
+> Basic Auth Required
+
+Request Body:
+
+```
+{
+	"name": "Target Master File Name", //ex: Event
+	"region": "Target region", // ex: jp
+	"group": true/false // Check src/data/index.ts -> ParseGroup
+}
+```
+
+Response Example:
+
+```
+{
+  "result": [
+		["Event-jp", "create", "1],
+		["Event-jp", "create", "2],
+		["Event-jp", "create", "3]
+		....
+	]
+}
+```

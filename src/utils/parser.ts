@@ -43,15 +43,18 @@ export const parseMasterItem = (
           ] = item
         })
       } else if (parseField.relation) {
-        if (typeof obj[key2] !== 'object') {
-          obj[key2] = [obj[key2]]
-        }
-        objItem[parseField.name || formated] = []
-        obj[key2].forEach((item: any) => {
-          objItem[parseField.name || formated].push(
-            relationData[parseField!.relation!.target][item][locale].id,
-          )
-        })
+        try {
+          if (typeof obj[key2] === 'object') {
+            objItem[parseField.name || formated] = []
+            obj[key2].forEach((item: any) => {
+              objItem[parseField.name || formated].push(
+                relationData[parseField!.relation!.target][item][locale].id,
+              )
+            })
+          } else
+            objItem[parseField.name || formated] =
+              relationData[parseField!.relation!.target][obj[key2]][locale].id
+        } catch (e) {}
       } else if (parseField.asJSON) {
         objItem[parseField.name || formated] = JSON.stringify(obj[key2])
       } else if (parseField.changeValueByName) {

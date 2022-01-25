@@ -7,6 +7,8 @@ export const ParseGroup: types.ParseGroupType = {
   Music: ['ChartAchieve', 'ChartDesigner', 'Music', 'Chart'],
   Event: [],
   Items: ['StockViewCategory', 'Stock', 'Reward'],
+  ClubItem: ['ClubItemDetail', 'ClubItemSpot', 'ClubItem'],
+  Mission: ['MissionGroup', 'MissionPanel', 'MissionDetail'],
   Etc: [],
 }
 
@@ -31,6 +33,9 @@ const conditionCustomParser: types.ParserDataCustomFieldsContent = {
 }
 
 export const ParserData: types.ParserDatasType = {
+  AssistOptionPreset: {
+    name: 'assist-option-presets',
+  },
   Attribute: {
     name: 'attributes',
   },
@@ -158,6 +163,63 @@ export const ParserData: types.ParserDatasType = {
   ChartDesigner: {
     name: 'chart-designers',
   },
+  ClubItem: {
+    fields: {
+      detailId: {
+        relation: {
+          target: 'club-item-details',
+        },
+      },
+      spotPrimaryKey: {
+        name: 'spot',
+        relation: {
+          target: 'club-item-spots',
+        },
+      },
+    },
+    name: 'club-items',
+  },
+  ClubItemDetail: {
+    fields: {
+      requiredStockId1: {
+        name: 'requiredStock1',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId2: {
+        name: 'requiredStock2',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId3: {
+        name: 'requiredStock3',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId4: {
+        name: 'requiredStock4',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId5: {
+        name: 'requiredStock5',
+        relation: {
+          target: 'stocks',
+        },
+      },
+    },
+    name: 'club-item-details',
+  },
+  ClubItemSpot: {
+    fields: {
+      catgory: 'category',
+    },
+    name: 'club-item-spots',
+  },
   Episode: {
     customFields: {
       fields: [conditionCustomParser],
@@ -210,6 +272,197 @@ export const ParserData: types.ParserDatasType = {
     },
     name: 'events',
   },
+  EventAggregationBase: {
+    fields: {
+      eventPrimaryKey: {
+        name: 'event',
+        relation: {
+          target: 'events',
+        },
+      },
+    },
+    name: 'event-aggregation-bases',
+  },
+  EventMedleySetlist: {
+    fields: {
+      aggregationPrimaryKey: {
+        name: 'aggregation',
+        relation: {
+          target: 'event-aggregation-bases',
+        },
+      },
+      characterMatchParameterBonusPrimaryKey: {
+        name: 'characterMatchParameterBonus',
+        relation: {
+          target: 'parameter-bonuses',
+        },
+      },
+      musicIds: {
+        name: 'musics',
+        relation: {
+          target: 'music-games',
+        },
+      },
+      specificBonusCharacterIds: {
+        relation: {
+          target: 'characters',
+        },
+      },
+    },
+    name: 'event-medley-setlists',
+  },
+  EventPointReward: {
+    fields: {
+      aggregationPrimaryKey: {
+        name: 'aggregation',
+        relation: {
+          target: 'event-aggregation-bases',
+        },
+      },
+    },
+    name: 'event-point-rewards',
+  },
+  EventRankingReward: {
+    fields: {
+      aggregationPrimaryKey: {
+        name: 'aggregation',
+        relation: {
+          target: 'event-aggregation-bases',
+        },
+      },
+    },
+    name: 'event-ranking-rewards',
+  },
+  EventSpecificBonus: {
+    fields: {
+      allMatchParameterBonusPrimaryKey: {
+        name: 'allMatchParameterBonus',
+        relation: {
+          target: 'parameter-bonuses',
+        },
+      },
+      attributeId: {
+        name: 'attribute',
+        relation: {
+          target: 'attributes',
+        },
+      },
+      attributeMatchParameterBonusPrimaryKey: {
+        name: 'attributeMatchParameterBonus',
+        relation: {
+          target: 'parameter-bonuses',
+        },
+      },
+      characterIds: {
+        name: 'characters',
+        relation: {
+          target: 'characters',
+        },
+      },
+      characterMatchParameterBonusPrimaryKey: {
+        name: 'characterMatchParameterBonus',
+        relation: {
+          target: 'parameter-bonuses',
+        },
+      },
+      eventPrimaryKey: {
+        name: 'event',
+        relation: {
+          target: 'events',
+        },
+      },
+    },
+    name: 'event-specific-bonuses',
+  },
+  Exchange: {
+    fields: {
+      gaugeColorCodes: {
+        ignore: true,
+      },
+    },
+    name: 'exchanges',
+  },
+  ExchangeItem: {
+    fields: {
+      exchangePrimaryKey: {
+        name: 'exchange',
+        relation: {
+          target: 'exchanges',
+        },
+      },
+      requiredStockId1: {
+        name: 'requiredStock1',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId2: {
+        name: 'requiredStock2',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId3: {
+        name: 'requiredStock3',
+        relation: {
+          target: 'stocks',
+        },
+      },
+      requiredStockId4: {
+        name: 'requiredStock4',
+        relation: {
+          target: 'stocks',
+        },
+      },
+    },
+    name: 'exchange-items',
+  },
+  Gacha: {
+    fields: {
+      _unused: {
+        ignore: true,
+      },
+      homeAnimationCardsPrimaryKey: {
+        ignore: true,
+      },
+      pickUpCardsPrimaryKey: {
+        name: 'pickUpCards',
+        relation: {
+          target: 'cards',
+        },
+      },
+      pickUpDuplicateBonusStockAmounts: {
+        ignore: true,
+      },
+      pickUpDuplicateBonusStockIds: {
+        ignore: true,
+      },
+      selectBonusCardsPrimaryKey: {
+        ignore: true,
+      },
+      selectBonusRewardsPrimaryKey: {
+        ignore: true,
+      },
+      tableIds: {
+        ignore: true,
+      },
+      tableRatesPrimaryKey: {
+        ignore: true,
+      },
+    },
+    name: 'gachas',
+  },
+  Honor: {
+    fields: {
+      duplicateStockAmounts: {
+        asJSON: true,
+      },
+      duplicateStockIds: {
+        asJSON: true,
+      },
+    },
+    name: 'honors',
+  },
   Live2DUIChat: {
     fields: {
       categories: {
@@ -244,6 +497,79 @@ export const ParserData: types.ParserDatasType = {
       },
     },
     name: 'live-result-episodes',
+  },
+  LoginBonus: {
+    customFields: {
+      fields: [
+        {
+          name: 'loginBonusItems',
+          parser: (originalData, loadedData, locale) =>
+            loadedData['!LoginBonusItem']
+              .filter(
+                (item) => item['__LoginBonusPrimaryKey__'] === originalData.Id,
+              )
+              .map((item) =>
+                parseMasterItem(
+                  item,
+                  {
+                    loginBonusPrimaryKey: {
+                      ignore: true,
+                    },
+                    positions: {
+                      asJSON: true,
+                    },
+                    rewardsPrimaryKey: {
+                      name: 'rewards',
+                      relation: {
+                        target: 'rewards',
+                      },
+                    },
+                  },
+                  loadedData,
+                  locale,
+                ),
+              ),
+        },
+      ],
+      load: ['rewards', '!LoginBonusItem'],
+    },
+    fields: {
+      datePositions: {
+        asJSON: true,
+      },
+    },
+    name: 'login-bonuses',
+  },
+  MissionDetail: {
+    fields: {
+      rewardsPrimaryKey: {
+        name: 'rewards',
+        relation: {
+          target: 'rewards',
+        },
+      },
+    },
+    name: 'mission-details',
+  },
+  MissionGroup: {
+    name: 'mission-groups',
+  },
+  MissionPanel: {
+    fields: {
+      allCompleteRewardsPrimaryKey: {
+        name: 'allCompleteRewards',
+        relation: {
+          target: 'rewards',
+        },
+      },
+      groupPrimaryKey: {
+        name: 'group',
+        relation: {
+          target: 'mission-groups',
+        },
+      },
+    },
+    name: 'mission-panels',
   },
   Music: {
     customFields: {
@@ -284,6 +610,12 @@ export const ParserData: types.ParserDatasType = {
     },
     name: 'music-games',
   },
+  OptionPreset: {
+    name: 'option-presets',
+  },
+  ParameterBonus: {
+    name: 'parameter-bonuses',
+  },
   PassiveSkill: {
     name: 'passive-skills',
   },
@@ -295,6 +627,78 @@ export const ParserData: types.ParserDatasType = {
       rarityId: 'rarity',
     },
     name: 'passive-skill-exps',
+  },
+  QuestBlock: {
+    fields: {
+      assistOptionPrimaryKey: {
+        name: 'assistOption',
+        relation: {
+          target: 'assist-option-presets',
+        },
+      },
+      chartPrimaryKey: {
+        name: 'chart',
+        relation: {
+          target: 'charts',
+        },
+      },
+      firstRewardsPrimaryKey: {
+        name: 'firstRewards',
+        relation: {
+          target: 'rewards',
+        },
+      },
+      loopRewardsPrimaryKey: {
+        name: 'loopRewards',
+        relation: {
+          target: 'rewards',
+        },
+      },
+      mapPrimaryKey: {
+        name: 'map',
+        relation: {
+          target: 'quest-maps',
+        },
+      },
+      optionPrimaryKey: {
+        name: 'option',
+        relation: {
+          target: 'option-presets',
+        },
+      },
+    },
+    name: 'quest-blocks',
+  },
+  QuestClubDeck: {
+    fields: {
+      itemPrimaryKey: {
+        name: 'item',
+        relation: {
+          target: 'club-items',
+        },
+      },
+      spotPrimaryKey: {
+        name: 'spot',
+        relation: {
+          target: 'club-item-spots',
+        },
+      },
+    },
+    name: 'quest-club-decks',
+  },
+  QuestDeck: {
+    fields: {
+      cardPrimaryKey: {
+        name: 'card',
+        relation: {
+          target: 'cards',
+        },
+      },
+    },
+    name: 'quest-decks',
+  },
+  QuestMap: {
+    name: 'quest-maps',
   },
   Rarity: {
     fields: {
@@ -309,10 +713,32 @@ export const ParserData: types.ParserDatasType = {
       },
     },
   },
+  Reward: {
+    name: 'rewards',
+  },
   Skill: {
     name: 'skills',
   },
+  Stamp: {
+    name: 'stamps',
+  },
   Stock: {
+    customFields: {
+      fields: [
+        {
+          name: 'random',
+          parser: (originalData, loadedData, locale) =>
+            loadedData['!RandomStock']
+              .filter((item) => item['OriginalStockId'] === originalData.Id)
+              .map((item) => ({
+                stockId: item.StockId,
+                amount: item.Amount,
+                rate: item.Rate,
+              })),
+        },
+      ],
+      load: ['!RandomStock'],
+    },
     fields: {
       viewCategoryPrimaryKey: {
         name: 'viewCategory',

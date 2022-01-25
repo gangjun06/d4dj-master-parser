@@ -60,6 +60,7 @@ export const getAll = async (props: { name: string }) => {
       params: {
         'pagination[page]': curPage,
         'pagination[pageSize]': 1000,
+        populate: [],
         ...locales,
       },
       headers: {
